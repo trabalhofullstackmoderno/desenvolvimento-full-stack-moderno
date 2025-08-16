@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,6 +13,62 @@ model User {
   email         String   @unique
   password_hash String
   created_at    DateTime @default(now())
+  contacts Contact[]
+  messages Message[]
 
   @@map("users")
+}
+
+model Contact {
+  id            String   @id @default(uuid())
+  user_id       String   @default(uuid())
+  contact_id    String   @default(uuid())
+  name          String
+  email         String
+  created_at    DateTime @default(now())
+  chats Chat[]
+
+  user          User @relation(fields: [user_id], references: [id])
+  contact       User @relation(fields: [contact_id], references: [id])
+
+  @@map("contacts")
+}
+
+model Message {
+  id            String   @id @default(uuid())
+  user_id       String   @default(uuid())
+  chat_id       String   @default(uuid())
+  content       String
+  created_at    DateTime @default(now())
+
+  user          User @relation(fields: [user_id], references: [id])
+  chat          Chat @relation(fields: [chat_id], references: [id])
+
+  @@map("messages")
+}
+
+model Chat {
+  id            String   @id @default(uuid())
+  created_at    DateTime @default(now())
+  user_id    String   @default(uuid())
+  contact_id    String   @default(uuid())
+  notification Notifications[]
+  messages Message[]
+
+  user          User @relation(fields: [user_id], references: [id])
+  chat          User @relation(fields: [contact_id], references: [id])
+
+  @@map("chats")
+}
+
+model Notifications {
+  id            String   @id @default(uuid())
+  chat_id       String   @default(uuid())
+  content       String
+  is_read       Boolean
+  created_at    DateTime @default(now())
+
+  chat          Chat @relation(fields: [chat_id], references: [id])
+
+  @@map("notifications")
 }
