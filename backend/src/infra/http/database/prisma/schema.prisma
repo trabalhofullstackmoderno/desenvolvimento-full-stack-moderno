@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String
+  password  String 
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  contacts  Contact[]  @relation("OwnerContacts")
+  messages  Message[]
+  conversations1 Conversation[] @relation("ConversationUser1")
+  conversations2 Conversation[] @relation("ConversationUser2")
+
+  linkedContacts Contact[] @relation("ContactLinkedUser")
+}
+
+model Contact {
+  id           String   @id @default(uuid())
+  ownerId      String
+  linkedUserId String?
+  email        String?
+  name         String
+  createdAt    DateTime @default(now())
+
+  owner       User @relation("OwnerContacts", fields: [ownerId], references: [id])
+  linkedUser  User? @relation("ContactLinkedUser", fields: [linkedUserId], references: [id]) // <- Add relation name
+
+  @@unique([ownerId, email])
+}
+
+
+model Conversation {
+  id        String   @id @default(uuid())
+  user1Id   String
+  user2Id   String
+  createdAt DateTime @default(now())
+
+  user1 User @relation("ConversationUser1", fields: [user1Id], references: [id])
+  user2 User @relation("ConversationUser2", fields: [user2Id], references: [id])
+
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+  isRead         Boolean  @default(false)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+}
