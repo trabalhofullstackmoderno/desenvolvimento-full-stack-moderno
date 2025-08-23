@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/infra/http/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@fastify/cookie": "11.0.2",
     "@fastify/jwt": "9.1.0",
+    "@fastify/oauth2": "^8.1.2",
     "@prisma/client": "6.8.2",
     "bcryptjs": "3.0.2",
     "dayjs": "1.11.13",
@@ -39,5 +40,3 @@
     "zod": "3.25.20"
   }
 }
-
-
