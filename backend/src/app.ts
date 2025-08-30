@@ -5,10 +5,16 @@ import { env } from "./env"
 import fastifyJwt from "@fastify/jwt"
 import fastifyOauth2 from "@fastify/oauth2"
 import { usersRoutes } from './http/controllers/users/routes'
+import fastifyCors from "@fastify/cors";
 
 export const app = fastify()
 
 app.register(fastifyCookie)
+
+app.register(fastifyCors, {
+  origin: "http://localhost:3000",
+  credentials: true,
+});
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
@@ -20,7 +26,6 @@ app.register(fastifyJwt, {
     expiresIn: "10m",
   },
 })
-
 
 app.register(fastifyOauth2, {
   name: "googleOAuth2",
