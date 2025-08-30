@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  name      String
-  password  String 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        String   @id @default(uuid())
+  googleId  String   @unique
+  email     String   @unique
+  name      String?
+  picture   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  contacts  Contact[]  @relation("OwnerContacts")
-  messages  Message[]
+  contacts       Contact[]      @relation("OwnerContacts")
+  messages       Message[]
   conversations1 Conversation[] @relation("ConversationUser1")
   conversations2 Conversation[] @relation("ConversationUser2")
 
@@ -31,12 +32,11 @@ model Contact {
   name         String
   createdAt    DateTime @default(now())
 
-  owner       User @relation("OwnerContacts", fields: [ownerId], references: [id])
-  linkedUser  User? @relation("ContactLinkedUser", fields: [linkedUserId], references: [id]) // <- Add relation name
+  owner      User  @relation("OwnerContacts", fields: [ownerId], references: [id])
+  linkedUser User? @relation("ContactLinkedUser", fields: [linkedUserId], references: [id]) // <- Add relation name
 
   @@unique([ownerId, email])
 }
-
 
 model Conversation {
   id        String   @id @default(uuid())

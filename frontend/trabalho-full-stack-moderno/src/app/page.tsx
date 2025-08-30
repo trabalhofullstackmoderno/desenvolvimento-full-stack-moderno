@@ -1,37 +1,19 @@
-import React from 'react';
-import { Container, TextField, Button, Box, Typography, Paper } from '@mui/material';
+"use client";
 
-export default function Page() {
+import { Box } from "@mui/material";
+import Sidebar from "@/components/layout/Sidebar";
+import Chat from "@/components/layout/Chat";
+
+export default function HomePage() {
   return (
-    <Box
-      sx={{
-        backgroundImage: 'url(/imagens/fundo1.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h5" align="center" gutterBottom>
-            Login Para o chat
-          </Typography>
-          <Box component="form" noValidate autoComplete="off">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 2 }}
-            >
-              Entrar com o Google
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
+    <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f0f2f5" }}>
+      <Box sx={{ width: 350, borderRight: "1px solid #ddd", bgcolor: "white" }}>
+        <Sidebar />
+      </Box>
+
+      <Box sx={{ flex: 1, bgcolor: "#ece5dd" }}>
+        <Chat />
+      </Box>
     </Box>
   );
 }

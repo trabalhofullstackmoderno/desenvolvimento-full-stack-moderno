@@ -8,6 +8,8 @@ import { usersRoutes } from './http/controllers/users/routes'
 
 export const app = fastify()
 
+app.register(fastifyCookie)
+
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
   cookie: {
@@ -19,7 +21,6 @@ app.register(fastifyJwt, {
   },
 })
 
-app.register(fastifyCookie)
 
 app.register(fastifyOauth2, {
   name: "googleOAuth2",
@@ -48,7 +49,7 @@ app.setErrorHandler((error, _, reply) => {
   if (env.NODE_ENV !== "production") {
     console.error(error)
   } else {
-    // TODO: logar em ferramenta externa tipo DataDog/NewRelic/Sentry
+    // TODO: integrar com DataDog/Sentry/etc
   }
 
   return reply.status(500).send({ message: "Internal server error." })
