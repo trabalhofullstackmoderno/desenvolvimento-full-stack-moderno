@@ -17,3 +17,37 @@ Aplicativo de mensagens em tempo real, construído com Next.js (React) no front-
 - **Back-end:** Node.js, Express.js, TypeScript  
 - **Banco de Dados:** MongoDB, PostgreSQL, Redis  
 - **Testes:** Jest, Cypress
+
+
+
+### Instalação
+1° criar banco chamado "trabalho"
+2° entrar na pasta desenvolvimento-fullstack-moderno
+3° dar os seguintes comandos
+
+cd frontend/
+npm i
+
+cd ..
+
+cd backend/
+npm i
+
+4° criar arquivo .env e colocar segundo esse modelo:
+
+DATABASE_URL="mysql://<seu usuario>:<sua senha>@<url do banco>:<porta do banco>/trabalho"
+JWT_SECRET=default
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+5° mover .env para a pasta do backend
+
+6° entrar na pasta do backend e dar os seguintes comandos:
+
+npx prisma generate
+npx prisma migrate deploy
+
+
+### Iniciar as aplicações
+- **Front-end:**  npm run dev  
+- **Back-end:** npm run dev

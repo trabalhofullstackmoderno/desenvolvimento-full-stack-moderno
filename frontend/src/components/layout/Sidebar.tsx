@@ -70,6 +70,7 @@ export default function Sidebar() {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
+            
             <MenuItem onClick={handleLogout}>Sair</MenuItem>
           </Menu>
         </Box>
