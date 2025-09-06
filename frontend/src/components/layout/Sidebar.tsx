@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import  useContacts  from "../../hooks/useContacts";
 import {
   Box,
   Avatar,
@@ -28,6 +29,11 @@ export default function Sidebar() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+  //função para criar contato
+  const handleCriaContato = async () => {
+    
+
+  }
 
   const handleLogout = async () => {
     try {
@@ -70,7 +76,7 @@ export default function Sidebar() {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
-            
+            <MenuItem onClick={handleCriaContato}>Criar Contato</MenuItem>
             <MenuItem onClick={handleLogout}>Sair</MenuItem>
           </Menu>
         </Box>
