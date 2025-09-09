@@ -26,16 +26,14 @@ model User {
 
 model Contact {
   id           String   @id @default(uuid())
-  ownerId      String
-  linkedUserId String?
-  email        String?
-  name         String
+  user_id      String   @unique
+  contact_id   String?
+  nickname     String
+  is_blocked   Boolean @default(false)
   createdAt    DateTime @default(now())
 
-  owner      User  @relation("OwnerContacts", fields: [ownerId], references: [id])
-  linkedUser User? @relation("ContactLinkedUser", fields: [linkedUserId], references: [id]) // <- Add relation name
-
-  @@unique([ownerId, email])
+  owner      User  @relation("OwnerContacts", fields: [user_id], references: [id])
+  linkedUser User? @relation("ContactLinkedUser", fields: [contact_id], references: [id])
 }
 
 model Conversation {

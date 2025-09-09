@@ -7,7 +7,5 @@ export async function usersRoutes(app: FastifyInstance) {
     return authenticate(app, request, reply)
   })
 
-  app.get("/logout", async (request, reply) => {
-    return logout(app, request, reply)
-  })
+  app.get("/logout", logout)
 }
