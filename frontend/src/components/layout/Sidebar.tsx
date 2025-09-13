@@ -31,6 +31,7 @@ export default function Sidebar() {
   };
   //função para criar contato
   const handleCriaContato = async () => {
+    router.replace("/contact")
     
 
   }

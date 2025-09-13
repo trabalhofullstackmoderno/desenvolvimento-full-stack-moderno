@@ -7,15 +7,6 @@ import { useState } from "react";
 import PerfilContact from "@/components/layout/PerfilContact";
 
 export default function HomePage() {
-  const [contatoAtual,setContatoAtual] = useState({})
-  const [visualizaoContato, setVisualizaoContato] = useState(true)
-  let mainContato;
-  if (visualizaoContato == true){
-    mainContato = < PerfilContact />
-  }
-  else{
-    mainContato = < Chat />
-  }
 
   return (
     <Box sx={{ display: "flex", height: "100vh", bgcolor: "#f0f2f5" }}>
@@ -24,8 +15,8 @@ export default function HomePage() {
       </Box>
 
       <Box sx={{ flex: 1, bgcolor: "#ece5dd" }}>
-        
-        {mainContato}
+      < Chat />
+      
       </Box>
     </Box>
   );
