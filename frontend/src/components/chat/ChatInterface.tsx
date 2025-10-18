@@ -482,13 +482,7 @@ const ChatInterface: React.FC = () => {
                       sx={{ px: 2, py: 1.5 }}
                     >
                       <ListItemAvatar>
-                        <Box
-                          sx={{
-                            textAlign: "center",
-                            p: 4,
-                            backgroundColor: "rgba(112, 235, 218, 0.96)", // Cor de fundo adicionada aqui
-                          }}
-                        ></Box>
+                        
                         <Badge
                           overlap="circular"
                           anchorOrigin={{
