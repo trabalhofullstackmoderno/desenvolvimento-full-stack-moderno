@@ -25,6 +25,7 @@ import {
   Circle as OnlineIcon,
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
+import Image from 'next/image'
 import ChatWindow from "./ChatWindow";
 import ContactSearch from "./ContactSearch";
 import { useWebSocket } from "@/hooks/useWebSocket";
@@ -339,6 +340,14 @@ const ChatInterface: React.FC = () => {
           flexDirection: "column",
         }}
       >
+        <Box
+          sx={{
+            textAlign: "center",
+            p: 4,
+            backgroundColor: "rgba(112, 235, 218, 0.96)",
+          }}
+        >
+        </Box>
         <CircularProgress size={40} />
         <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
           Syncing your Google contacts...
@@ -349,7 +358,7 @@ const ChatInterface: React.FC = () => {
           textAlign="center"
           sx={{ maxWidth: 400 }}
         >
-          We're importing your Google contacts to find friends who are also
+          Were importing your Google contacts to find friends who are also
           using this app. This may take a moment.
         </Typography>
       </Box>
@@ -368,6 +377,14 @@ const ChatInterface: React.FC = () => {
       <Box
         sx={{ width: 400, borderRight: "1px solid #e0e0e0", bgcolor: "white" }}
       >
+        <Box
+          sx={{
+            textAlign: "center",
+            p: 4,
+            backgroundColor: "rgba(112, 235, 218, 0.96)",
+          }}
+        >
+        </Box>
         {/* Header */}
         <Box
           sx={{ p: 2, borderBottom: "1px solid #e0e0e0", bgcolor: "#f5f5f5" }}
@@ -380,23 +397,27 @@ const ChatInterface: React.FC = () => {
               mb: 2,
             }}
           >
-            <Typography variant="h6" fontWeight="bold">
-              Chats
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  bgcolor: isConnected ? "success.main" : "error.main",
-                }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {isConnected ? "Connected" : "Disconnected"}
+            <Box>
+
+              <Typography variant="h6" fontWeight="bold">
+                Chats
               </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    bgcolor: isConnected ? "success.main" : "error.main",
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {isConnected ? "Connected" : "Disconnected"}
+                </Typography>
+              </Box>
             </Box>
           </Box>
+
 
           <TextField
             fullWidth
@@ -431,16 +452,18 @@ const ChatInterface: React.FC = () => {
           ) : (
             <List disablePadding>
               {filteredConversations.length === 0 && !loading ? (
-                <Box sx={{ textAlign: "center", p: 4 }}>
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    p: 4,
+                    backgroundColor: "rgba(112, 235, 218, 0.96)",
+                  }}
+                >
                   <Typography variant="h6" color="text.secondary" gutterBottom>
                     No conversations yet
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
-                  >
-                    Start a new conversation by entering someone's email
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Start a new conversation by entering someone`s email
                   </Typography>
                   <Button
                     variant="contained"
@@ -459,6 +482,13 @@ const ChatInterface: React.FC = () => {
                       sx={{ px: 2, py: 1.5 }}
                     >
                       <ListItemAvatar>
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            p: 4,
+                            backgroundColor: "rgba(112, 235, 218, 0.96)", // Cor de fundo adicionada aqui
+                          }}
+                        ></Box>
                         <Badge
                           overlap="circular"
                           anchorOrigin={{
@@ -594,35 +624,42 @@ const ChatInterface: React.FC = () => {
               justifyContent: "center",
               height: "100%",
               color: "text.secondary",
+
+              textAlign: "center",
+              p: 4,
+              backgroundColor: "rgba(161, 243, 232, 0.96)", // Cor de fundo adicionada aqui
+
             }}
+            
           >
-            <Typography variant="h6" gutterBottom>
-              Select a conversation to start chatting
-            </Typography>
-            <Typography variant="body2">
-              Choose a contact from your list or start a new conversation
-            </Typography>
-          </Box>
-        )}
+           
+        <Typography variant="h6" gutterBottom>
+          Select a conversation to start chatting
+        </Typography>
+        <Typography variant="body2">
+          Choose a contact from your list or start a new conversation
+        </Typography>
       </Box>
-
-      {/* New conversation button */}
-      <Fab
-        color="primary"
-        aria-label="new chat"
-        sx={{ position: "fixed", bottom: 24, right: 24 }}
-        onClick={() => setContactSearchOpen(true)}
-      >
-        <EditIcon />
-      </Fab>
-
-      {/* Contact search dialog */}
-      <ContactSearch
-        open={contactSearchOpen}
-        onClose={() => setContactSearchOpen(false)}
-        onSelectContact={handleNewConversation}
-      />
+        )}
     </Box>
+
+      {/* New conversation button */ }
+  <Fab
+    color="primary"
+    aria-label="new chat"
+    sx={{ position: "fixed", bottom: 24, right: 24 }}
+    onClick={() => setContactSearchOpen(true)}
+  >
+    <EditIcon />
+  </Fab>
+
+  {/* Contact search dialog */ }
+  <ContactSearch
+    open={contactSearchOpen}
+    onClose={() => setContactSearchOpen(false)}
+    onSelectContact={handleNewConversation}
+  />
+    </Box >
   );
 };
 
