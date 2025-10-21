@@ -1,9 +1,21 @@
 "use client";
 
-import { Box, Paper, Typography, Button } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
+import { Box, Button, Paper, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    const token = localStorage.getItem('accessToken') || new URLSearchParams(window.location.search).get('token');
+    if (token) {
+      router.push('/');
+    }
+  }, [router]);
+
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Box
@@ -22,7 +34,7 @@ export default function LoginPage() {
             alignItems: "center",
             justifyContent: "center",
             p: 6,
-            bgcolor: "rgba(248, 248, 248, 0.96)",
+            bgcolor: "rgba(112, 235, 218, 0.96)",
           }}
         >
           <Typography
@@ -30,6 +42,7 @@ export default function LoginPage() {
             variant="h5"
             fontWeight="bold"
             gutterBottom
+            sx={{ color: 'white' }}
           >
             Acesso ao Chat
           </Typography>

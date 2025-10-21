@@ -1,38 +1,51 @@
-import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify"
-import { OAuth2Token } from "@fastify/oauth2"
-import { PrismaClient } from "@prisma/client"
-import { InvalidCredentialsError } from "@/services/errors/invalid-credentials-error"
+import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
+import { OAuth2Token } from "@fastify/oauth2";
+import { PrismaClient } from "@prisma/client";
+import { InvalidCredentialsError } from "@/services/errors/invalid-credentials-error";
+import crypto from "crypto";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 interface GoogleToken extends OAuth2Token {
-  access_token: string
-  token_type: string
-  expires_in: number
-  refresh_token?: string
-  id_token?: string
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  refresh_token?: string;
+  id_token?: string;
 }
 
 interface GoogleUserInfo {
-  id: string
-  email: string
-  name: string
-  picture: string
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
 }
 
 export async function authenticate(
-  app: FastifyInstance, 
-  request: FastifyRequest, 
-  reply: FastifyReply
+  app: FastifyInstance,
+  request: FastifyRequest,
+  reply: FastifyReply,
 ) {
   try {
-    const { token } = (await app.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request)) as GoogleToken
+    const { token } =
+      (await app.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(
+        request,
+      )) as GoogleToken;
 
-    const userInfoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-      headers: { Authorization: `Bearer ${token.access_token}` },
-    })
+    const userInfoRes = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      },
+    );
 
-    const userInfo = (await userInfoRes.json()) as GoogleUserInfo
+    const userInfo = (await userInfoRes.json()) as GoogleUserInfo;
+
+    // Encrypt tokens before storing
+    const encryptedAccessToken = encryptToken(token.access_token);
+    const encryptedRefreshToken = token.refresh_token
+      ? encryptToken(token.refresh_token)
+      : null;
 
     const user = await prisma.user.upsert({
       where: {
@@ -43,16 +56,20 @@ export async function authenticate(
         googleId: userInfo.id,
         name: userInfo.name,
         picture: userInfo.picture,
+        accessToken: encryptedAccessToken,
+        refreshToken: encryptedRefreshToken,
       },
       update: {
         email: userInfo.email,
         name: userInfo.name,
         picture: userInfo.picture,
+        accessToken: encryptedAccessToken,
+        refreshToken: encryptedRefreshToken,
       },
-    })
+    });
 
-    if(!user){
-      new InvalidCredentialsError()
+    if (!user) {
+      new InvalidCredentialsError();
     }
 
     const accessToken = app.jwt.sign(
@@ -62,24 +79,69 @@ export async function authenticate(
         name: userInfo.name,
         picture: userInfo.picture,
       },
-      { expiresIn: "10m" }
-    )
+      { expiresIn: "1h" },
+    );
 
     const refreshToken = app.jwt.sign(
       { sub: userInfo.id },
-      { expiresIn: "7d" }
-    )
+      { expiresIn: "7d" },
+    );
+
+    // Set both access token and refresh token in cookies
+    reply.setCookie("accessToken", accessToken, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 3600 // 1 hour
+    });
 
     reply.setCookie("refreshToken", refreshToken, {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-    })
+      maxAge: 604800 // 7 days
+    });
 
-    return reply.redirect(`http://localhost:3000?token=${accessToken}`)
+    return reply.redirect(`http://localhost:3000?token=${accessToken}`);
   } catch (error) {
-    console.error(error)
-    return reply.status(500).send({ message: "Erro interno", error })
+    console.error(error);
+    return reply.status(500).send({ message: "Erro interno", error });
   }
+}
+
+function encryptToken(token: string): string {
+  const algorithm = "aes-256-gcm";
+  const secretKey =
+    process.env.ENCRYPTION_SECRET || "fallback-secret-key-change-in-production";
+  const key = crypto.scryptSync(secretKey, "salt", 32);
+  const iv = crypto.randomBytes(16);
+
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(token, "utf8", "hex");
+  encrypted += cipher.final("hex");
+
+  const authTag = cipher.getAuthTag();
+
+  return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
+}
+
+export function decryptToken(encryptedToken: string): string {
+  const algorithm = "aes-256-gcm";
+  const secretKey =
+    process.env.ENCRYPTION_SECRET || "fallback-secret-key-change-in-production";
+  const key = crypto.scryptSync(secretKey, "salt", 32);
+
+  const [ivHex, authTagHex, encrypted] = encryptedToken.split(":");
+  const iv = Buffer.from(ivHex, "hex");
+  const authTag = Buffer.from(authTagHex, "hex");
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  decipher.setAuthTag(authTag);
+
+  let decrypted = decipher.update(encrypted, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+
+  return decrypted;
 }

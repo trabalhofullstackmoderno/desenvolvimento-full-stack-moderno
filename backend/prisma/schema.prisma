@@ -3,61 +3,127 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  googleId  String   @unique
-  email     String   @unique
-  name      String?
-  picture   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  contacts       Contact[]      @relation("OwnerContacts")
-  messages       Message[]
-  conversations1 Conversation[] @relation("ConversationUser1")
-  conversations2 Conversation[] @relation("ConversationUser2")
-
-  linkedContacts Contact[] @relation("ContactLinkedUser")
-}
-
-model Contact {
   id           String   @id @default(uuid())
-  user_id      String   @unique
-  contact_id   String?
-  nickname     String
-  is_blocked   Boolean @default(false)
+  googleId     String   @unique
+  email        String   @unique
+  name         String?
+  picture      String?
+  accessToken  String?
+  refreshToken String?
+  isOnline     Boolean  @default(false)
+  lastSeen     DateTime @default(now())
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  owner      User  @relation("OwnerContacts", fields: [user_id], references: [id])
-  linkedUser User? @relation("ContactLinkedUser", fields: [contact_id], references: [id])
+  // Google contacts for user discovery
+  googleContacts     GoogleContact[]    @relation("UserGoogleContacts")
+
+  // Chat functionality
+  sentMessages       Message[]          @relation("SentMessages")
+  conversations1     Conversation[]     @relation("ConversationUser1")
+  conversations2     Conversation[]     @relation("ConversationUser2")
+
+  // Notifications
+  pushSubscriptions  PushSubscription[] @relation("UserPushSubscriptions")
+
+  // Typing indicators
+  typingInConversations TypingIndicator[] @relation("TypingUser")
 }
 
 model Conversation {
-  id        String   @id @default(uuid())
-  user1Id   String
-  user2Id   String
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  user1Id      String
+  user2Id      String
+  lastMessage  String?
+  lastMessageAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   user1 User @relation("ConversationUser1", fields: [user1Id], references: [id])
   user2 User @relation("ConversationUser2", fields: [user2Id], references: [id])
 
   messages Message[]
+  typingIndicators TypingIndicator[]
 
   @@unique([user1Id, user2Id])
+  @@index([lastMessageAt])
 }
 
 model Message {
-  id             String   @id @default(uuid())
+  id             String      @id @default(uuid())
   conversationId String
   senderId       String
   content        String
-  createdAt      DateTime @default(now())
-  isRead         Boolean  @default(false)
+  messageType    MessageType @default(TEXT)
+  mediaUrl       String?
+  isRead         Boolean     @default(false)
+  isDelivered    Boolean     @default(false)
+  readAt         DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime    @default(now())
 
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-  sender       User         @relation(fields: [senderId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+model TypingIndicator {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  isTyping       Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation("TypingUser", fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+}
+
+model GoogleContact {
+  id             String   @id @default(uuid())
+  userId         String
+  googlePersonId String
+  name           String
+  email          String?
+  phoneNumber    String?
+  photoUrl       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation("UserGoogleContacts", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, googlePersonId])
+  @@index([userId])
+  @@index([email])
+}
+
+
+model PushSubscription {
+  id       String @id @default(uuid())
+  userId   String
+  endpoint String
+  p256dh   String
+  auth     String
+  createdAt DateTime @default(now())
+
+  user User @relation("UserPushSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
 }
