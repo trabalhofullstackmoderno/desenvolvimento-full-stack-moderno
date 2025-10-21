@@ -280,50 +280,66 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
       </Paper>
 
       {/* Messages area */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: 1,
-          bgcolor: '#f5f5f5',
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23e0e0e0" fill-opacity="0.1"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
-        }}
-      >
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            {messages.map((message, index) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isOwn={message.senderId !== conversation.contact.id}
-                showAvatar={
-                  index === 0 ||
-                  messages[index - 1].senderId !== message.senderId
-                }
-                showTimestamp={
-                  index === messages.length - 1 ||
-                  messages[index + 1].senderId !== message.senderId ||
-                  new Date(messages[index + 1].createdAt).getTime() - new Date(message.createdAt).getTime() > 300000
-                }
-              />
-            ))}
+      {/* Container geral, para posicionar a camada de fundo */}
+      <Box sx={{ position: 'relative', flex: 1, overflow: 'auto', p: 1, bgcolor: '#f5f5f5' }}>
 
-            {/* Typing indicator */}
-            {otherUserTyping.length > 0 && (
-              <TypingIndicator
-                userName={conversation.contact.name}
-                avatar={conversation.contact.picture}
-              />
-            )}
+        {/* Camada só da imagem de fundo, repetida e esmaecida */}
+        <Box
+          sx={{
+            //position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundImage: "url(/imagens/fundo1.jpg)",
+            backgroundAttachment: 'absolute',
+            backgroundSize: 'auto',
+            backgroundPosition: 'top left',
+            opacity: 0.2,           
+            pointerEvents: 'none',  
+            zIndex: 0,
+          }}
+        />
 
-            <div ref={messagesEndRef} />
-          </>
-        )}
+        {/* Conteúdo por cima da imagem */}
+        <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {messages.map((message, index) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isOwn={message.senderId !== conversation.contact.id}
+                  showAvatar={
+                    index === 0 ||
+                    messages[index - 1].senderId !== message.senderId
+                  }
+                  showTimestamp={
+                    index === messages.length - 1 ||
+                    messages[index + 1].senderId !== message.senderId ||
+                    new Date(messages[index + 1].createdAt).getTime() - new Date(message.createdAt).getTime() > 300000
+                  }
+                />
+              ))}
+
+              {/* Typing indicator */}
+              {otherUserTyping.length > 0 && (
+                <TypingIndicator
+                  userName={conversation.contact.name}
+                  avatar={conversation.contact.picture}
+                />
+              )}
+
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </Box>
       </Box>
+
 
       {/* Message input */}
       <Paper
