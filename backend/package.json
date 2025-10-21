@@ -50,7 +50,6 @@
     "fastify-type-provider-zod": "^6.0.0",
     "googleapis": "^164.1.0",
     "jsonwebtoken": "^9.0.2",
-    "tsc": "^2.0.4",
     "web-push": "^3.6.7",
     "ws": "^8.18.3",
     "zod": "^4.1.12"
