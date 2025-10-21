@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { GoogleContactsService } from '@/services/google-contacts-service'
 import { prisma } from '@/lib/prisma'
 
@@ -33,12 +33,10 @@ export async function searchContacts(request: FastifyRequest, reply: FastifyRepl
   } catch (error) {
     console.error('Error searching contacts:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
+
 
     return reply.status(500).send({ message: 'Internal server error' })
   }
@@ -108,11 +106,8 @@ export async function findUserByEmail(request: FastifyRequest, reply: FastifyRep
   } catch (error) {
     console.error('Error finding user by email:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Invalid email format',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })

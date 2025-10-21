@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { WebSocketService } from '@/services/websocket-service'
 
@@ -84,11 +84,8 @@ export async function getMessages(request: FastifyRequest, reply: FastifyReply) 
   } catch (error) {
     console.error('Error getting messages:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })
@@ -181,11 +178,8 @@ export async function sendMessage(request: FastifyRequest, reply: FastifyReply) 
   } catch (error) {
     console.error('Error sending message:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })
@@ -234,11 +228,8 @@ export async function markMessageAsRead(request: FastifyRequest, reply: FastifyR
   } catch (error) {
     console.error('Error marking message as read:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })

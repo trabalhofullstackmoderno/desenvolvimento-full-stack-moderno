@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { z } from "zod";
+import { z, ZodError } from 'zod'
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 const createConversationBodySchema = z.object({
   contactEmail: z.string().email(),
@@ -114,11 +115,8 @@ export async function createConversation(
   } catch (error) {
     console.error("Error creating conversation:", error);
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: "Validation error",
-        errors: error.errors,
-      });
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: "Internal server error" });
@@ -191,7 +189,7 @@ export async function getConversations(
     });
 
     // Format conversations for frontend
-    const formattedConversations = conversations.map((conv) => {
+    const formattedConversations = conversations.map((conv: Prisma) => {
       const otherUser =
         conv.user1Id === currentUser.id ? conv.user2 : conv.user1;
       const lastMessage = conv.messages[0];
@@ -226,11 +224,8 @@ export async function getConversations(
   } catch (error) {
     console.error("Error getting conversations:", error);
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: "Validation error",
-        errors: error.errors,
-      });
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: "Internal server error" });

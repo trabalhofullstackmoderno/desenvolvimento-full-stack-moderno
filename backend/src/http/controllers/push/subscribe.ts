@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 import { PushNotificationService } from '@/services/push-notification-service'
 
 const subscribeBodySchema = z.object({
@@ -22,11 +22,8 @@ export async function subscribePush(request: FastifyRequest, reply: FastifyReply
   } catch (error) {
     console.error('Error subscribing to push notifications:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })
@@ -45,11 +42,8 @@ export async function unsubscribePush(request: FastifyRequest, reply: FastifyRep
   } catch (error) {
     console.error('Error unsubscribing from push notifications:', error)
 
-    if (error instanceof z.ZodError) {
-      return reply.status(400).send({
-        message: 'Validation error',
-        errors: error.errors
-      })
+    if(error instanceof ZodError) {
+      return reply.status(400).send({ message: "Validation error", issues: error.format() })
     }
 
     return reply.status(500).send({ message: 'Internal server error' })

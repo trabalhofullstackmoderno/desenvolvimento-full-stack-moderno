@@ -4,9 +4,10 @@ import { getThreads, getThread } from './threads'
 import { syncEmails, syncContacts } from './sync'
 import { searchEmails, searchContacts } from './search'
 import { markEmailAsRead } from './mark-read'
+import { verifyJWT } from '@/middlewares/verify-jwt'
 
 export async function emailRoutes(app: FastifyInstance) {
-  app.addHook('onRequest', app.authenticate)
+    app.addHook('onRequest', verifyJWT)
 
   // Email operations
   app.post('/emails/send', sendEmail)

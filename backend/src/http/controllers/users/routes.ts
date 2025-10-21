@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify"
 import { authenticate } from "./authenticate"
 import { logout } from "./logout"
 import { getMe } from "./me"
+import { verifyJWT } from "@/middlewares/verify-jwt"
 
 export async function usersRoutes(app: FastifyInstance) {
   // Public routes
@@ -11,7 +12,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
   // Protected routes
   app.register(async function (fastify) {
-    fastify.addHook('onRequest', fastify.authenticate)
+    app.addHook('onRequest', verifyJWT)
 
     fastify.get("/me", getMe)
     fastify.get("/logout", logout)

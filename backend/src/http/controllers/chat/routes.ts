@@ -2,9 +2,10 @@ import { FastifyInstance } from 'fastify'
 import { createConversation, getConversations } from './conversations'
 import { getMessages, sendMessage, markMessageAsRead } from './messages'
 import { syncContacts, searchContacts, getRegisteredContacts, findUserByEmail } from './contacts'
+import { verifyJWT } from '@/middlewares/verify-jwt'
 
 export async function chatRoutes(app: FastifyInstance) {
-  app.addHook('onRequest', app.authenticate)
+  app.addHook('onRequest', verifyJWT)
 
   // Conversation operations
   app.post('/conversations', createConversation)
