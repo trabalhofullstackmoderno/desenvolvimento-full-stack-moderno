@@ -3,7 +3,9 @@ import { FastifyInstance } from "fastify";
 import { getVapidPublicKey, subscribePush, unsubscribePush } from "./subscribe";
 
 export async function pushRoutes(app: FastifyInstance) {
-  
+  // Public route for VAPID key
+  app.get("/push/vapid-public-key", getVapidPublicKey);
+
   const getVapidPublicKeySchemas = {
     tags: ["Subscribe"],
     response: {
@@ -25,9 +27,6 @@ export async function pushRoutes(app: FastifyInstance) {
       },
     },
   };
-  // Public route for VAPID key
-  app.get("/push/vapid-public-key", {schema:getVapidPublicKeySchemas},getVapidPublicKey);
-
   const subscribePushSchemas = {
     tags: ["Subscribe"],
     body: {
