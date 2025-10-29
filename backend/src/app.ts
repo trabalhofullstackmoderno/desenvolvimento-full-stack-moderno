@@ -37,10 +37,7 @@ app.register(fastifySwaggerUi, {
 app.register(fastifyCookie);
 
 app.register(fastifyCors, {
-  origin: [
-    "http://localhost:3000",
-    "https://desenvolvimento-full-stack-moderno.onrender.com"
-  ],
+  origin: true,
   credentials: true,
 });
 
@@ -114,6 +111,13 @@ app.register(async function (fastify) {
     // Continue without WebSocket if it fails
   }
 })
+
+// Register OAuth callback route FIRST (before any auth middleware)
+app.get("/login/google/callback", async (request, reply) => {
+  console.log("Direct callback route hit");
+  const { authenticate } = await import("./http/controllers/users/authenticate");
+  return authenticate(app, request, reply);
+});
 
 app.register(usersRoutes);
 app.register(chatRoutes);

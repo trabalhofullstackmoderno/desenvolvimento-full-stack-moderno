@@ -5,10 +5,7 @@ import { getMe } from "./me"
 import { verifyJWT } from "@/middlewares/verify-jwt"
 
 export async function usersRoutes(app: FastifyInstance) {
-  // Public routes
-  app.get("/login/google/callback", async (request, reply) => {
-    return authenticate(app, request, reply)
-  })
+  // OAuth callback is now registered directly in app.ts
 
   // Protected routes
   app.register(async function (fastify) {
