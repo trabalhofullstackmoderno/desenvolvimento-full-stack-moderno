@@ -70,7 +70,7 @@ app.register(fastifyOauth2, {
     auth: fastifyOauth2.GOOGLE_CONFIGURATION,
   },
   startRedirectPath: "/login/google",
-  callbackUri: "http://localhost:3333/login/google/callback",
+  callbackUri: env.GOOGLE_CALLBACK_URL,
 });
 
 // Authentication middleware
