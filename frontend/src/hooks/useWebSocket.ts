@@ -33,7 +33,7 @@ export const useWebSocket = (): UseWebSocketReturn => {
         return
       }
 
-      const wsUrl = `ws://localhost:3333/ws?token=${token}`
+      const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3333'}/ws?token=${token}`
       ws.current = new WebSocket(wsUrl)
 
       ws.current.onopen = () => {

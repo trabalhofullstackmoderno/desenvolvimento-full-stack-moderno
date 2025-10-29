@@ -40,7 +40,7 @@ export default function Sidebar() {
     try {
       setSessionJWT(null);
 
-      await axios.get("http://localhost:3333/logout", {
+      await axios.get("/logout", {
         withCredentials: true,
       });
 

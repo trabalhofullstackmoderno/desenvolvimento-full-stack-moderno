@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 const axios = Axios.create({
-  baseURL: "http://localhost:3333",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333",
   withCredentials: true, // Include cookies in requests
 });
 

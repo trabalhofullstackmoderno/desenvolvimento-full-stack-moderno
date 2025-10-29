@@ -51,7 +51,7 @@ export default function LoginPage() {
             fullWidth
             variant="contained"
             startIcon={<GoogleIcon />}
-            href="http://localhost:3333/login/google"
+            href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'}/login/google`}
             sx={{
               mt: 4,
               py: 1.5,
