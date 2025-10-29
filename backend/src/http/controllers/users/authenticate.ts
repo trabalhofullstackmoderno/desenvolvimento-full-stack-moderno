@@ -112,8 +112,20 @@ export async function authenticate(
 
     return reply.redirect(`${frontendUrl}?token=${accessToken}`);
   } catch (error) {
-    console.error(error);
-    return reply.status(500).send({ message: "Erro interno", error });
+    console.error("OAuth Error:", error);
+
+    // Se for erro de OAuth, retorna erro específico
+    if (error instanceof Error && error.message.includes('OAuth')) {
+      return reply.status(401).send({
+        message: "Erro de autenticação OAuth",
+        error: error.message
+      });
+    }
+
+    return reply.status(500).send({
+      message: "Erro interno",
+      error: error instanceof Error ? error.message : error
+    });
   }
 }
 
