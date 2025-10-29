@@ -46,7 +46,7 @@ export class WebSocketService {
           { websocket: true } as any,
           (connection: any, req: any) => {
             wsService.handleConnection(
-              connection.socket as AuthenticatedSocket,
+              connection.socket,
               req,
             );
           },
@@ -64,7 +64,7 @@ export class WebSocketService {
     try {
       const token = req.query.token;
       if (!token) {
-        socket.close?.();
+        socket.close();
         return;
       }
 
@@ -75,13 +75,18 @@ export class WebSocketService {
       });
 
       if (!user) {
-        socket.close?.();
+        socket.close();
         return;
       }
 
-      const authenticatedSocket = socket as AuthenticatedSocket;
-      authenticatedSocket.userId = user.id;
-      authenticatedSocket.user = user;
+      // Create authenticated socket object
+      const authenticatedSocket: AuthenticatedSocket = {
+        userId: user.id,
+        user: user,
+        close: () => socket.close(),
+        on: (event: string, listener: (...args: any[]) => void) => socket.on(event, listener),
+        send: (data: string) => socket.send(data)
+      };
       this.connectedUsers.set(user.id, authenticatedSocket);
 
       await this.updateUserOnlineStatus(user.id, true);
@@ -103,7 +108,7 @@ export class WebSocketService {
       );
     } catch (error) {
       console.error("WebSocket authentication error:", error);
-      socket.close?.();
+      socket.close();
     }
   }
 
