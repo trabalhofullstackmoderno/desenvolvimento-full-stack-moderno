@@ -7,7 +7,9 @@ export async function pushRoutes(app: FastifyInstance) {
   app.get('/push/vapid-public-key', getVapidPublicKey)
 
   // Protected routes
-  app.addHook('onRequest', verifyJWT)
-  app.post('/push/subscribe', subscribePush)
-  app.delete('/push/unsubscribe', unsubscribePush)
+  app.register(async function (fastify) {
+    fastify.addHook('onRequest', verifyJWT)
+    fastify.post('/push/subscribe', subscribePush)
+    fastify.delete('/push/unsubscribe', unsubscribePush)
+  })
 }
