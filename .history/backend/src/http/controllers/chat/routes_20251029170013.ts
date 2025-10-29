@@ -576,9 +576,9 @@ const findUserByEmailSchemas = {
     fastify.put('/messages/:messageId/read', {schema:markMessageAsReadSchemas},markMessageAsRead)
 
     // Contact operations
-    fastify.post('/contacts/sync', {schema: syncContactsSchemas}, syncContacts)
-    fastify.get('/contacts/search', {schema:searchContactsSchemas},searchContacts)
-    fastify.get('/contacts/registered', {schema: getRegisteredContactsSchemas},getRegisteredContacts)
-    fastify.get('/contacts/find-by-email', {schema: findUserByEmailSchemas},findUserByEmail)
+    fastify.post('/contacts/sync', syncContacts)
+    fastify.get('/contacts/search', searchContacts)
+    fastify.get('/contacts/registered', getRegisteredContacts)
+    fastify.get('/contacts/find-by-email', findUserByEmail)
   })
 }

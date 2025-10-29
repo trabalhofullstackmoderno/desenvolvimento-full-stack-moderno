@@ -567,18 +567,18 @@ const findUserByEmailSchemas = {
     fastify.addHook('onRequest', verifyJWT)
 
     // Conversation operations
-    fastify.post('/conversations', {schema: createConversationSchemas},createConversation)
-    fastify.get('/conversations',{schema: getConversationsSchemas} ,getConversations)
+    fastify.post('/conversations', createConversation)
+    fastify.get('/conversations', getConversations)
 
     // Message operations
-    fastify.get('/conversations/:conversationId/messages',{schema:getMessagesSchemas}, getMessages)
-    fastify.post('/conversations/:conversationId/messages', {schema:sendMessageSchemas}, sendMessage)
-    fastify.put('/messages/:messageId/read', {schema:markMessageAsReadSchemas},markMessageAsRead)
+    fastify.get('/conversations/:conversationId/messages', getMessages)
+    fastify.post('/conversations/:conversationId/messages', sendMessage)
+    fastify.put('/messages/:messageId/read', markMessageAsRead)
 
     // Contact operations
-    fastify.post('/contacts/sync', {schema: syncContactsSchemas}, syncContacts)
-    fastify.get('/contacts/search', {schema:searchContactsSchemas},searchContacts)
-    fastify.get('/contacts/registered', {schema: getRegisteredContactsSchemas},getRegisteredContacts)
-    fastify.get('/contacts/find-by-email', {schema: findUserByEmailSchemas},findUserByEmail)
+    fastify.post('/contacts/sync', syncContacts)
+    fastify.get('/contacts/search', searchContacts)
+    fastify.get('/contacts/registered', getRegisteredContacts)
+    fastify.get('/contacts/find-by-email', findUserByEmail)
   })
 }
