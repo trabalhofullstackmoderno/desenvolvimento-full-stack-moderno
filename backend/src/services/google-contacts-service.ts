@@ -62,8 +62,8 @@ export class GoogleContactsService {
             googlePersonId,
             name,
             email,
-            phoneNumber,
-            photoUrl,
+            phoneNumber: phoneNumber || undefined,
+            photoUrl: photoUrl || undefined,
           });
         }
       }
@@ -118,7 +118,7 @@ export class GoogleContactsService {
     });
 
     // Check which contacts are registered users
-    const contactEmails = contacts.map((c) => c.email).filter(Boolean);
+    const contactEmails = contacts.map((c) => c.email).filter((email): email is string => Boolean(email));
     const registeredUsers = await prisma.user.findMany({
       where: {
         email: { in: contactEmails },

@@ -53,11 +53,11 @@ export async function getThread(request: FastifyRequest, reply: FastifyReply) {
     if (error instanceof z.ZodError) {
       return reply.status(400).send({
         message: 'Validation error',
-        errors: error.errors
+        errors: error.issues
       })
     }
 
-    if (error.message === 'Thread not found') {
+    if (error instanceof Error && error.message === 'Thread not found') {
       return reply.status(404).send({ message: 'Thread not found' })
     }
 

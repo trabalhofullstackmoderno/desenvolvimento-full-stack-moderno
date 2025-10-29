@@ -4,17 +4,18 @@ import { makeCreateContactService } from "@/services/factories/make-create-conta
 
 export async function create(request: FastifyRequest, reply: FastifyReply) {
   const createContactBodySchema = z.object({
-    email: z.string(),
-    nickname: z.string(),
+    name: z.string(),
+    phoneNumber: z.string().optional(),
   });
 
-  const { email, nickname } = createContactBodySchema.parse(request.body);
+  const { name, phoneNumber } = createContactBodySchema.parse(request.body);
 
   const createService = makeCreateContactService();
 
   await createService.execute({
-    email,
-    nickname,
+    name,
+    phoneNumber,
+    userId: request.user.sub,
   });
 
   return reply.status(201).send();

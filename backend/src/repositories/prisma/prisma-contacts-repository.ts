@@ -14,7 +14,7 @@ export class PrismaContactsRepository implements ContactsRepository {
 		return contact
 	}
 
-	async create(data: Prisma.ContactUncheckedCreateInput) {
+	async create(data: Prisma.ContactCreateInput) {
 		const contact = await prisma.contact.create({
 			data
 		})

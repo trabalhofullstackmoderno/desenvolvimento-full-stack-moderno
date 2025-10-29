@@ -189,7 +189,7 @@ export async function getConversations(
     });
 
     // Format conversations for frontend
-    const formattedConversations = conversations.map((conv: Prisma) => {
+    const formattedConversations = conversations.map((conv) => {
       const otherUser =
         conv.user1Id === currentUser.id ? conv.user2 : conv.user1;
       const lastMessage = conv.messages[0];

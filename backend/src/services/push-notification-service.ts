@@ -93,7 +93,7 @@ export class PushNotificationService {
           console.error('Error sending notification to subscription:', error)
 
           // Remove invalid subscriptions
-          if (error.statusCode === 410 || error.statusCode === 404) {
+          if ((error as any)?.statusCode === 410 || (error as any)?.statusCode === 404) {
             await prisma.pushSubscription.delete({
               where: { id: subscription.id }
             })

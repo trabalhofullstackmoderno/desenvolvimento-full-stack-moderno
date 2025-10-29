@@ -2,8 +2,9 @@ import { Contact } from "@prisma/client";
 import { ContactsRepository } from "@/repositories/contacts-repository";
 
 interface CreateContactServiceRequest {
-  nickname: string,
-  user_id: string
+  name: string,
+  phoneNumber?: string,
+  userId: string
 }
 
 interface CreateContactServiceResponse {
@@ -13,10 +14,11 @@ interface CreateContactServiceResponse {
 export class CreateContactService {
   constructor(private contactsRepository: ContactsRepository) { }
 
-  async execute({ nickname, user_id }: CreateContactServiceRequest): Promise<CreateContactServiceResponse> {
+  async execute({ name, phoneNumber, userId }: CreateContactServiceRequest): Promise<CreateContactServiceResponse> {
     const contact = await this.contactsRepository.create({
-      nickname,
-      user_id,
+      name,
+      phoneNumber,
+      user: { connect: { id: userId } }
     })
 
     return { contact };

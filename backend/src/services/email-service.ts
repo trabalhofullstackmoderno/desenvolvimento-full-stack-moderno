@@ -127,10 +127,7 @@ export class EmailService {
         // Upsert thread
         const emailThread = await prisma.emailThread.upsert({
           where: {
-            userId_threadId: {
-              userId,
-              threadId: thread.id
-            }
+            threadId: thread.id
           },
           create: {
             userId,
@@ -174,17 +171,15 @@ export class EmailService {
                 recipientId,
                 fromEmail,
                 toEmail,
-                ccEmails,
-                bccEmails,
                 subject,
+                content: body.text || body.html || '',
                 textBody: body.text,
                 htmlBody: body.html,
                 gmailId: message.id,
+                messageId: message.id,
                 isRead: message.labelIds?.includes('UNREAD') ? false : true,
-                isStarred: message.labelIds?.includes('STARRED') || false,
-                labels: message.labelIds || [],
-                attachments: [],
-                sentAt
+                sentAt,
+                receivedAt: sentAt
               }
             })
           }
@@ -263,7 +258,7 @@ export class EmailService {
         }
       },
       include: {
-        thread: true
+        emailThread: true
       },
       orderBy: { sentAt: 'desc' },
       take: limit

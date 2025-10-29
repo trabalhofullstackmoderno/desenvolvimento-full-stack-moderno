@@ -33,6 +33,10 @@ model User {
 
   // Typing indicators
   typingInConversations TypingIndicator[] @relation("TypingUser")
+
+  // User contacts and emails
+  contacts     Contact[]     @relation("UserContacts")
+  emailThreads EmailThread[] @relation("UserEmailThreads")
 }
 
 model Conversation {
@@ -126,4 +130,63 @@ model PushSubscription {
 
   @@unique([userId, endpoint])
   @@index([userId])
+}
+
+model Contact {
+  id          String   @id @default(uuid())
+  name        String
+  phoneNumber String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation("UserContacts", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailThread {
+  id        String   @id @default(uuid())
+  subject   String
+  threadId  String   @unique
+  userId    String
+  lastEmail DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation("UserEmailThreads", fields: [userId], references: [id], onDelete: Cascade)
+  emails Email[]
+
+  @@unique([userId, threadId])
+  @@index([userId])
+  @@index([threadId])
+}
+
+model Email {
+  id           String    @id @default(uuid())
+  messageId    String    @unique
+  gmailId      String?   @unique
+  threadId     String
+  subject      String
+  fromEmail    String
+  fromName     String?
+  toEmail      String
+  content      String
+  textBody     String?
+  htmlBody     String?
+  isRead       Boolean   @default(false)
+  senderId     String?
+  recipientId  String?
+  sentAt       DateTime  @default(now())
+  receivedAt   DateTime
+  createdAt    DateTime  @default(now())
+
+  emailThread EmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([messageId])
+  @@index([gmailId])
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([sentAt])
 }
