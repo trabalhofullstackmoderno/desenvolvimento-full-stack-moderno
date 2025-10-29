@@ -60,11 +60,11 @@ export class WebSocketService {
     }
   }
 
-  private async handleConnection(socket: AuthenticatedSocket, req: any) {
+  private async handleConnection(socket: any, req: any) {
     try {
       const token = req.query.token;
       if (!token) {
-        socket.close();
+        socket.close?.();
         return;
       }
 
@@ -75,26 +75,27 @@ export class WebSocketService {
       });
 
       if (!user) {
-        socket.close();
+        socket.close?.();
         return;
       }
 
-      socket.userId = user.id;
-      socket.user = user;
-      this.connectedUsers.set(user.id, socket);
+      const authenticatedSocket = socket as AuthenticatedSocket;
+      authenticatedSocket.userId = user.id;
+      authenticatedSocket.user = user;
+      this.connectedUsers.set(user.id, authenticatedSocket);
 
       await this.updateUserOnlineStatus(user.id, true);
       await this.broadcastOnlineStatus(user.id, true);
 
-      socket.on("message", async (message: Buffer) => {
-        await this.handleMessage(socket, message);
+      authenticatedSocket.on("message", async (message: Buffer) => {
+        await this.handleMessage(authenticatedSocket, message);
       });
 
-      socket.on("close", async () => {
-        await this.handleDisconnect(socket);
+      authenticatedSocket.on("close", async () => {
+        await this.handleDisconnect(authenticatedSocket);
       });
 
-      socket.send(
+      authenticatedSocket.send(
         JSON.stringify({
           type: "connected",
           data: { userId: user.id, status: "online" },
@@ -102,7 +103,7 @@ export class WebSocketService {
       );
     } catch (error) {
       console.error("WebSocket authentication error:", error);
-      socket.close();
+      socket.close?.();
     }
   }
 

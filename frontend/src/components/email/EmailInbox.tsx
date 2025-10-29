@@ -204,9 +204,10 @@ const EmailInbox: React.FC = () => {
                     >
                       <ListItemText
                         primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Box component="span" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Typography
                               variant="subtitle2"
+                              component="span"
                               sx={{
                                 fontWeight: 'bold',
                                 overflow: 'hidden',
@@ -217,20 +218,22 @@ const EmailInbox: React.FC = () => {
                             >
                               {thread.subject || 'No Subject'}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" color="text.secondary" component="span">
                               {formatDate(thread.lastEmail)}
                             </Typography>
                           </Box>
                         }
                         secondary={
-                          <Box>
+                          <Box component="span">
                             <Typography
                               variant="body2"
                               color="text.secondary"
+                              component="span"
                               sx={{
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
+                                whiteSpace: 'nowrap',
+                                display: 'block'
                               }}
                             >
                               {thread.latestEmailPreview}

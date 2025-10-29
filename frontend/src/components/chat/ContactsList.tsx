@@ -201,12 +201,12 @@ const ContactsList: React.FC<ContactsListProps> = ({ onContactSelect }) => {
                     </Typography>
                   }
                   secondary={
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
+                    <Box component="span">
+                      <Typography variant="body2" color="text.secondary" component="span" sx={{ display: 'block' }}>
                         {contact.email}
                       </Typography>
                       {contact.isRegistered && contact.registeredUser && (
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" color="text.secondary" component="span" sx={{ display: 'block' }}>
                           {contact.registeredUser.isOnline
                             ? 'Online'
                             : formatLastSeen(contact.registeredUser.lastSeen)

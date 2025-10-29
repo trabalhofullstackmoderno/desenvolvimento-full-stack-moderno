@@ -115,16 +115,16 @@ export async function authenticate(
     console.error("OAuth Error:", error);
 
     // Se for erro de OAuth, retorna erro específico
-    if (error instanceof Error && error.message.includes('OAuth')) {
+    if (error instanceof Error && error.message.includes("OAuth")) {
       return reply.status(401).send({
         message: "Erro de autenticação OAuth",
-        error: error.message
+        error: error.message,
       });
     }
 
     return reply.status(500).send({
       message: "Erro interno",
-      error: error instanceof Error ? error.message : error
+      error: error instanceof Error ? error.message : error,
     });
   }
 }

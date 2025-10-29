@@ -516,6 +516,7 @@ const ChatInterface: React.FC = () => {
                       <ListItemText
                         primary={
                           <Box
+                            component="span"
                             sx={{
                               display: "flex",
                               alignItems: "center",
@@ -524,6 +525,7 @@ const ChatInterface: React.FC = () => {
                           >
                             <Typography
                               variant="subtitle1"
+                              component="span"
                               sx={{
                                 fontWeight:
                                   conversation.unreadCount > 0
@@ -538,6 +540,7 @@ const ChatInterface: React.FC = () => {
                               {conversation.contact.name}
                             </Typography>
                             <Box
+                              component="span"
                               sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -548,6 +551,7 @@ const ChatInterface: React.FC = () => {
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
+                                  component="span"
                                 >
                                   {formatMessageTime(
                                     conversation.lastMessage.createdAt,
@@ -565,11 +569,12 @@ const ChatInterface: React.FC = () => {
                           </Box>
                         }
                         secondary={
-                          <Box>
+                          <Box component="span">
                             {conversation.lastMessage ? (
                               <Typography
                                 variant="body2"
                                 color="text.secondary"
+                                component="span"
                                 sx={{
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
@@ -578,6 +583,7 @@ const ChatInterface: React.FC = () => {
                                     conversation.unreadCount > 0
                                       ? "medium"
                                       : "normal",
+                                  display: "block"
                                 }}
                               >
                                 {conversation.lastMessage.content}
@@ -586,6 +592,8 @@ const ChatInterface: React.FC = () => {
                               <Typography
                                 variant="body2"
                                 color="text.secondary"
+                                component="span"
+                                sx={{ display: "block" }}
                               >
                                 {conversation.contact.isOnline
                                   ? "Online"
