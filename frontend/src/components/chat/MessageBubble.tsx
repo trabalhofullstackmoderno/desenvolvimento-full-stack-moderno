@@ -12,6 +12,7 @@ import {
   Done as SentIcon,
   Schedule as PendingIcon
 } from '@mui/icons-material'
+import { unifaeChatTheme } from '@/theme/unifaeTheme'
 
 interface Message {
   id: string
@@ -101,8 +102,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
           sx={{
             p: 1.5,
             borderRadius: 2,
-            bgcolor: isOwn ? 'primary.main' : 'white',
-            color: isOwn ? 'white' : 'text.primary',
+            ...(isOwn ? unifaeChatTheme.messageFromUser : unifaeChatTheme.messageFromOther),
             borderBottomRightRadius: isOwn && showAvatar ? 4 : 16,
             borderBottomLeftRadius: !isOwn && showAvatar ? 4 : 16,
             wordBreak: 'break-word'

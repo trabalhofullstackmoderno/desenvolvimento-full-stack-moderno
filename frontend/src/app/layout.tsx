@@ -3,8 +3,8 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "Meu App",
-  description: "Descrição do app",
+  title: "UNIFAE Chat - Centro Universitário das Faculdades Associadas de Ensino",
+  description: "Sistema de comunicação interna da UNIFAE",
 };
 
 export default function RootLayout({
