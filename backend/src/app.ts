@@ -37,7 +37,10 @@ app.register(fastifySwaggerUi, {
 app.register(fastifyCookie);
 
 app.register(fastifyCors, {
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://desenvolvimento-full-stack-moderno.onrender.com"
+  ],
   credentials: true,
 });
 

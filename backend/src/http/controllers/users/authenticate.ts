@@ -93,7 +93,7 @@ export async function authenticate(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 3600 // 1 hour
+      maxAge: 3600, // 1 hour
     });
 
     reply.setCookie("refreshToken", refreshToken, {
@@ -101,10 +101,16 @@ export async function authenticate(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 604800 // 7 days
+      maxAge: 604800, // 7 days
     });
 
-    return reply.redirect(`http://localhost:3000?token=${accessToken}`);
+    // Redirect to frontend (local or production based on environment)
+    const frontendUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "http://localhost:3000"
+        : "http://localhost:3000";
+
+    return reply.redirect(`${frontendUrl}?token=${accessToken}`);
   } catch (error) {
     console.error(error);
     return reply.status(500).send({ message: "Erro interno", error });
