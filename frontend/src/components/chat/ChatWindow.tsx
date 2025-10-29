@@ -22,6 +22,7 @@ import MessageBubble from './MessageBubble'
 import TypingIndicator from './TypingIndicator'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import axios from '@/auth/axios'
+import { unifaeChatTheme } from '@/theme/unifaeTheme'
 
 interface Contact {
   id: string
@@ -62,9 +63,11 @@ interface Message {
 
 interface ChatWindowProps {
   conversation: Conversation
+  onMessageSent?: (conversationId: string, messageContent: string) => void
+  onMessageReceived?: (message: any) => void
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onMessageSent, onMessageReceived }) => {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -90,7 +93,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
     if (lastMessage) {
       handleWebSocketMessage(lastMessage)
     }
-  }, [lastMessage])
+  }, [lastMessage, conversation.id])
 
   const loadMessages = async () => {
     setLoading(true)
@@ -105,10 +108,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
   }
 
   const handleWebSocketMessage = (message: any) => {
+    // Always notify ChatInterface about received messages (for sidebar updates)
+    if (message.type === 'new_message' && onMessageReceived) {
+      onMessageReceived(message);
+    }
+
     switch (message.type) {
       case 'new_message':
         if (message.data.conversationId === conversation.id) {
-          setMessages(prev => [...prev, message.data])
+          setMessages(prev => [...prev, message.data]);
         }
         break
       case 'message_sent':
@@ -136,6 +144,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
     setSending(true)
     const messageContent = newMessage.trim()
     setNewMessage('')
+
+    // Update sidebar immediately (visual only)
+    if (onMessageSent) {
+      onMessageSent(conversation.id, messageContent)
+    }
 
     try {
       // Send via WebSocket for real-time delivery
@@ -222,15 +235,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation }) => {
   const otherUserTyping = conversationTypers.filter(userId => userId === conversation.contact.id)
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      position: 'relative',
+      zIndex: 1
+    }}>
       {/* Chat header */}
       <Paper
         elevation={1}
         sx={{
           p: 2,
           borderRadius: 0,
-          borderBottom: '1px solid #e0e0e0',
-          bgcolor: 'white'
+          ...unifaeChatTheme.header
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { isValidToken, setSessionJWT } from "@/auth/jwt";
+import ThemeProvider from "./ThemeProvider";
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -30,5 +31,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     }
   }, [searchParams, router, pathname]);
 
-  return <>{children}</>;
+  return (
+    <ThemeProvider>
+      {children}
+    </ThemeProvider>
+  );
 }

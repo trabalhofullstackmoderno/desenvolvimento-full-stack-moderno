@@ -11,7 +11,6 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  Fab,
   Badge,
   Divider,
   CircularProgress,
@@ -31,6 +30,7 @@ import ContactSearch from "./ContactSearch";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useRouter } from "next/navigation";
 import axios from "@/auth/axios";
+import { unifaeChatTheme } from "@/theme/unifaeTheme";
 
 interface Contact {
   id: string;
@@ -68,6 +68,7 @@ const ChatInterface: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [contactsSynced, setContactsSynced] = useState(false);
   const [syncingContacts, setSyncingContacts] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const router = useRouter();
 
@@ -102,8 +103,9 @@ const ChatInterface: React.FC = () => {
         return;
       }
 
-      // Verify token by calling /me endpoint
-      await axios.get("/me");
+      // Verify token by calling /me endpoint and get current user data
+      const response = await axios.get("/me");
+      setCurrentUser(response.data.user);
       setIsAuthenticated(true);
     } catch (error) {
       console.error("Authentication check failed:", error);
@@ -177,7 +179,8 @@ const ChatInterface: React.FC = () => {
         handleNewMessage(message.data);
         break;
       case "message_sent":
-        // Update message status to sent
+        // Update conversation list when user sends a message
+        handleNewMessage(message.data);
         break;
       case "message_read":
         // Update message status to read
@@ -192,26 +195,79 @@ const ChatInterface: React.FC = () => {
   };
 
   const handleNewMessage = (message: any) => {
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === message.conversationId) {
-          return {
-            ...conv,
-            lastMessage: {
-              id: message.id,
-              content: message.content,
-              senderId: message.senderId,
-              senderName: message.sender.name,
-              createdAt: message.createdAt,
-              isRead: false,
-            },
-            unreadCount: conv.unreadCount + 1,
-            lastMessageAt: message.createdAt,
-          };
-        }
-        return conv;
-      }),
-    );
+    setConversations((prev) => {
+      // Check if conversation already exists
+      const existingConversation = prev.find(conv => conv.id === message.conversationId);
+
+      if (existingConversation) {
+        // Update existing conversation
+        const updatedConversations = prev.map((conv) => {
+          if (conv.id === message.conversationId) {
+            // Check if message is from current user
+            let isFromCurrentUser = false;
+
+            if (currentUser) {
+              isFromCurrentUser = currentUser.id === message.senderId;
+            }
+
+            // Check if this is the currently selected conversation
+            const isCurrentlyViewing = selectedConversation && selectedConversation.id === conv.id;
+
+            // Don't increment unread count if user is currently viewing this conversation or if it's from current user
+            const newUnreadCount = (isFromCurrentUser || isCurrentlyViewing) ? conv.unreadCount : conv.unreadCount + 1;
+
+            return {
+              ...conv,
+              lastMessage: {
+                id: message.id,
+                content: message.content,
+                senderId: message.senderId,
+                senderName: message.sender?.name || 'You',
+                createdAt: message.createdAt,
+                isRead: isFromCurrentUser,
+              },
+              unreadCount: newUnreadCount,
+              lastMessageAt: message.createdAt,
+            };
+          }
+          return conv;
+        });
+
+        // Sort conversations by lastMessageAt to put most recent first
+        return updatedConversations.sort((a, b) =>
+          new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+        );
+      } else {
+        // Create new conversation if it doesn't exist
+        const isFromCurrentUser = currentUser && currentUser.id === message.senderId;
+
+        const newConversation = {
+          id: message.conversationId,
+          contact: {
+            id: message.senderId,
+            name: message.sender?.name || 'Unknown',
+            email: message.sender?.email || '',
+            picture: message.sender?.picture || '',
+            isOnline: false,
+            lastSeen: new Date()
+          },
+          lastMessage: {
+            id: message.id,
+            content: message.content,
+            senderId: message.senderId,
+            senderName: message.sender?.name || 'Unknown',
+            createdAt: message.createdAt,
+            isRead: isFromCurrentUser || false,
+          },
+          unreadCount: isFromCurrentUser ? 0 : 1, // New conversations always get notification (since user isn't viewing them yet)
+          lastMessageAt: message.createdAt,
+          createdAt: message.createdAt,
+        };
+
+        // Add new conversation at the beginning
+        return [newConversation, ...prev];
+      }
+    });
   };
 
   const handleContactStatusChange = (data: any) => {
@@ -243,6 +299,34 @@ const ChatInterface: React.FC = () => {
         ),
       );
     }
+  };
+
+  // Function to update conversation list when user sends a message (visual only)
+  const updateConversationLastMessage = (conversationId: string, messageContent: string) => {
+    setConversations((prev) => {
+      const updatedConversations = prev.map((conv) => {
+        if (conv.id === conversationId) {
+          return {
+            ...conv,
+            lastMessage: {
+              id: Date.now().toString(), // temporary ID
+              content: messageContent,
+              senderId: currentUser?.id || 'current',
+              senderName: 'You',
+              createdAt: new Date().toISOString(),
+              isRead: true,
+            },
+            lastMessageAt: new Date().toISOString(),
+          };
+        }
+        return conv;
+      });
+
+      // Sort conversations by lastMessageAt to put most recent first
+      return updatedConversations.sort((a, b) =>
+        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+      );
+    });
   };
 
   const handleNewConversation = async (contactEmail: string) => {
@@ -340,14 +424,6 @@ const ChatInterface: React.FC = () => {
           flexDirection: "column",
         }}
       >
-        <Box
-          sx={{
-            textAlign: "center",
-            p: 4,
-            backgroundColor: "rgba(112, 235, 218, 0.96)",
-          }}
-        >
-        </Box>
         <CircularProgress size={40} />
         <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
           Syncing your Google contacts...
@@ -375,19 +451,17 @@ const ChatInterface: React.FC = () => {
     <Box sx={{ display: "flex", height: "100vh" }}>
       {/* Sidebar with conversations */}
       <Box
-        sx={{ width: 400, borderRight: "1px solid #e0e0e0", bgcolor: "white" }}
+        sx={{
+          width: 400,
+          ...unifaeChatTheme.sidebar
+        }}
       >
-        <Box
-          sx={{
-            textAlign: "center",
-            p: 4,
-            backgroundColor: "rgba(112, 235, 218, 0.96)",
-          }}
-        >
-        </Box>
         {/* Header */}
         <Box
-          sx={{ p: 2, borderBottom: "1px solid #e0e0e0", bgcolor: "#f5f5f5" }}
+          sx={{
+            p: 2,
+            ...unifaeChatTheme.header
+          }}
         >
           <Box
             sx={{
@@ -416,6 +490,22 @@ const ChatInterface: React.FC = () => {
                 </Typography>
               </Box>
             </Box>
+
+            {/* New conversation button */}
+            <IconButton
+              color="primary"
+              aria-label="new chat"
+              onClick={() => setContactSearchOpen(true)}
+              sx={{
+                bgcolor: "primary.main",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "primary.dark"
+                }
+              }}
+            >
+              <EditIcon />
+            </IconButton>
           </Box>
 
 
@@ -456,7 +546,7 @@ const ChatInterface: React.FC = () => {
                   sx={{
                     textAlign: "center",
                     p: 4,
-                    backgroundColor: "rgba(112, 235, 218, 0.96)",
+                    ...unifaeChatTheme.header,
                   }}
                 >
                   <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -558,47 +648,57 @@ const ChatInterface: React.FC = () => {
                                   )}
                                 </Typography>
                               )}
-                              {conversation.unreadCount > 0 && (
-                                <Badge
-                                  badgeContent={conversation.unreadCount}
-                                  color="primary"
-                                  sx={{ ml: 0.5 }}
-                                />
-                              )}
                             </Box>
                           </Box>
                         }
                         secondary={
-                          <Box component="span">
-                            {conversation.lastMessage ? (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                component="span"
+                          <Box component="span" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <Box sx={{ flex: 1, overflow: "hidden" }}>
+                              {conversation.lastMessage ? (
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  component="span"
+                                  sx={{
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    fontWeight:
+                                      conversation.unreadCount > 0
+                                        ? "medium"
+                                        : "normal",
+                                    display: "block"
+                                  }}
+                                >
+                                  {conversation.lastMessage.content}
+                                </Typography>
+                              ) : (
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  component="span"
+                                  sx={{ display: "block" }}
+                                >
+                                  {conversation.contact.isOnline
+                                    ? "Online"
+                                    : `Last seen ${formatLastSeen(conversation.contact.lastSeen)}`}
+                                </Typography>
+                              )}
+                            </Box>
+                            {conversation.unreadCount > 0 && (
+                              <Badge
+                                badgeContent={conversation.unreadCount}
+                                color="primary"
                                 sx={{
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
-                                  fontWeight:
-                                    conversation.unreadCount > 0
-                                      ? "medium"
-                                      : "normal",
-                                  display: "block"
+                                  mr: 1,
+                                  '& .MuiBadge-badge': {
+                                    fontSize: '0.7rem',
+                                    height: '18px',
+                                    minWidth: '18px',
+                                    borderRadius: '50%'
+                                  }
                                 }}
-                              >
-                                {conversation.lastMessage.content}
-                              </Typography>
-                            ) : (
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                component="span"
-                                sx={{ display: "block" }}
-                              >
-                                {conversation.contact.isOnline
-                                  ? "Online"
-                                  : `Last seen ${formatLastSeen(conversation.contact.lastSeen)}`}
-                              </Typography>
+                              />
                             )}
                           </Box>
                         }
@@ -614,9 +714,32 @@ const ChatInterface: React.FC = () => {
       </Box>
 
       {/* Main chat area */}
-      <Box sx={{ flex: 1, bgcolor: "#f5f5f5" }}>
+      <Box sx={{
+        flex: 1,
+        bgcolor: '#f5f5f5',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'url("/imagens/fundo1.jpg")',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center center',
+          backgroundSize: 'cover',
+          opacity: 0.05,
+          zIndex: -1,
+          pointerEvents: 'none'
+        }
+      }}>
         {selectedConversation ? (
-          <ChatWindow conversation={selectedConversation} />
+          <ChatWindow
+            conversation={selectedConversation}
+            onMessageSent={updateConversationLastMessage}
+            onMessageReceived={handleWebSocketMessage}
+          />
         ) : (
           <Box
             sx={{
@@ -626,13 +749,10 @@ const ChatInterface: React.FC = () => {
               justifyContent: "center",
               height: "100%",
               color: "text.secondary",
-
               textAlign: "center",
               p: 4,
-              backgroundColor: "rgba(161, 243, 232, 0.96)", // Cor de fundo adicionada aqui
-
+              zIndex: 1
             }}
-            
           >
            
         <Typography variant="h6" gutterBottom>
@@ -645,15 +765,6 @@ const ChatInterface: React.FC = () => {
         )}
     </Box>
 
-      {/* New conversation button */ }
-  <Fab
-    color="primary"
-    aria-label="new chat"
-    sx={{ position: "fixed", bottom: 24, right: 24 }}
-    onClick={() => setContactSearchOpen(true)}
-  >
-    <EditIcon />
-  </Fab>
 
   {/* Contact search dialog */ }
   <ContactSearch
