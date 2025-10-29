@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { env } from "@/env";
 import fastifyWebsocket from "@fastify/websocket";
 
-interface AuthenticatedSocket extends WebSocket {
+interface AuthenticatedSocket {
   userId?: string;
   user?: {
     id: string;
@@ -13,6 +13,9 @@ interface AuthenticatedSocket extends WebSocket {
     name: string | null;
     picture: string | null;
   };
+  close: () => void;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  send: (data: string) => void;
 }
 
 interface WebSocketMessage {
