@@ -69,7 +69,7 @@ app.register(fastifyOauth2, {
   generateStateFunction: () => {
     return Math.random().toString(36).substring(2, 15);
   },
-  checkStateFunction: (state, callback) => {
+  checkStateFunction: (request, callback) => {
     callback();
   },
   parameters: {
