@@ -66,6 +66,15 @@ app.register(fastifyOauth2, {
   },
   startRedirectPath: "/login/google",
   callbackUri: env.GOOGLE_CALLBACK_URL,
+  generateStateFunction: () => {
+    return Math.random().toString(36).substring(2, 15);
+  },
+  checkStateFunction: (state, callback) => {
+    callback();
+  },
+  parameters: {
+    prompt: "select_account",
+  },
 });
 
 // Authentication middleware
