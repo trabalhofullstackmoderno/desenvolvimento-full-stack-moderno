@@ -44,7 +44,7 @@ const NotificationSetup: React.FC = () => {
     try {
       const permissionGranted = await pushService.requestPermission()
       if (!permissionGranted) {
-        setError('Notification permission denied')
+        setError('Permissão de notificação negada')
         return
       }
 
@@ -53,11 +53,11 @@ const NotificationSetup: React.FC = () => {
         setIsSubscribed(true)
         setPermission('granted')
       } else {
-        setError('Failed to subscribe to push notifications')
+        setError('Falha ao se inscrever nas notificações push')
       }
     } catch (error) {
       console.error('Error enabling notifications:', error)
-      setError('Failed to enable notifications')
+      setError('Falha ao ativar notificações')
     } finally {
       setLoading(false)
     }
@@ -72,7 +72,7 @@ const NotificationSetup: React.FC = () => {
       if (unsubscribed) {
         setIsSubscribed(false)
       } else {
-        setError('Failed to disable notifications')
+        setError('Falha ao desativar notificações')
       }
     } catch (error) {
       console.error('Error disabling notifications:', error)
@@ -88,10 +88,10 @@ const NotificationSetup: React.FC = () => {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <NotificationsOffIcon color="disabled" sx={{ mr: 2 }} />
-            <Typography variant="h6">Push Notifications</Typography>
+            <Typography variant="h6">Notificações Push</Typography>
           </Box>
           <Alert severity="warning">
-            Push notifications are not supported in this browser.
+            Notificações push não são suportadas neste navegador.
           </Alert>
         </CardContent>
       </Card>
@@ -107,7 +107,7 @@ const NotificationSetup: React.FC = () => {
         </Box>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Get notified when you receive new emails, even when the app is closed.
+          Seja notificado quando receber novos emails, mesmo quando o app estiver fechado.
         </Typography>
 
         {error && (
@@ -125,12 +125,12 @@ const NotificationSetup: React.FC = () => {
                 disabled={loading}
               />
             }
-            label={isSubscribed ? 'Notifications enabled' : 'Enable notifications'}
+            label={isSubscribed ? 'Notificações ativadas' : 'Ativar notificações'}
           />
 
           {permission === 'denied' && (
             <Typography variant="caption" color="error">
-              Notifications blocked. Please enable in browser settings.
+              Notificações bloqueadas. Por favor, ative nas configurações do navegador.
             </Typography>
           )}
         </Box>
@@ -144,7 +144,7 @@ const NotificationSetup: React.FC = () => {
             fullWidth
             sx={{ mt: 2 }}
           >
-            {loading ? 'Setting up...' : 'Enable Email Notifications'}
+            {loading ? 'Configurando...' : 'Ativar Notificações de Email'}
           </Button>
         )}
       </CardContent>

@@ -72,7 +72,7 @@ const EmailInbox: React.FC = () => {
       setTotalPages(Math.ceil(response.data.total / threadsPerPage))
     } catch (error) {
       console.error('Error loading threads:', error)
-      setError('Failed to load emails')
+      setError('Falha ao carregar emails')
     } finally {
       setLoading(false)
     }
@@ -85,7 +85,7 @@ const EmailInbox: React.FC = () => {
       await loadThreads()
     } catch (error) {
       console.error('Error syncing emails:', error)
-      setError('Failed to sync emails')
+      setError('Falha ao sincronizar emails')
     } finally {
       setSyncing(false)
     }
@@ -107,7 +107,7 @@ const EmailInbox: React.FC = () => {
       const searchThreads = response.data.emails.map((email: any) => ({
         id: email.thread.id,
         threadId: email.thread.threadId,
-        subject: email.subject || 'No Subject',
+        subject: email.subject || 'Sem Assunto',
         lastEmail: email.sentAt,
         latestEmailPreview: email.textBody?.substring(0, 150) || '',
         emailCount: 1
@@ -116,7 +116,7 @@ const EmailInbox: React.FC = () => {
       setThreads(searchThreads)
     } catch (error) {
       console.error('Error searching emails:', error)
-      setError('Failed to search emails')
+      setError('Falha ao buscar emails')
     } finally {
       setLoading(false)
     }
@@ -134,7 +134,7 @@ const EmailInbox: React.FC = () => {
     if (diffInHours < 24) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     } else if (diffInHours < 48) {
-      return 'Yesterday'
+      return 'Ontem'
     } else {
       return date.toLocaleDateString()
     }
@@ -147,7 +147,7 @@ const EmailInbox: React.FC = () => {
         {/* Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid #ddd' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h6">Inbox</Typography>
+            <Typography variant="h6">Caixa de Entrada</Typography>
             <IconButton onClick={syncEmails} disabled={syncing}>
               {syncing ? <CircularProgress size={20} /> : <RefreshIcon />}
             </IconButton>
@@ -156,7 +156,7 @@ const EmailInbox: React.FC = () => {
           <TextField
             fullWidth
             size="small"
-            placeholder="Search emails..."
+            placeholder="Buscar emails..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={(e) => {
@@ -216,7 +216,7 @@ const EmailInbox: React.FC = () => {
                                 maxWidth: '250px'
                               }}
                             >
-                              {thread.subject || 'No Subject'}
+                              {thread.subject || 'Sem Assunto'}
                             </Typography>
                             <Typography variant="caption" color="text.secondary" component="span">
                               {formatDate(thread.lastEmail)}
@@ -240,7 +240,7 @@ const EmailInbox: React.FC = () => {
                             </Typography>
                             {thread.emailCount > 1 && (
                               <Chip
-                                label={`${thread.emailCount} messages`}
+                                label={`${thread.emailCount} mensagens`}
                                 size="small"
                                 variant="outlined"
                                 sx={{ mt: 0.5 }}
@@ -293,10 +293,10 @@ const EmailInbox: React.FC = () => {
             }}
           >
             <Typography variant="h6" gutterBottom>
-              Select an email to read
+              Selecione um email para ler
             </Typography>
             <Typography variant="body2">
-              Choose an email from the list to view its contents
+              Escolha um email da lista para ver seu conteúdo
             </Typography>
           </Box>
         )}

@@ -64,7 +64,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
 
   const handleSend = async () => {
     if (!to.length || !subject.trim()) {
-      setError('Please provide recipient and subject')
+      setError('Por favor, forneça o destinatário e assunto')
       return
     }
 
@@ -94,7 +94,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
       }, 1500)
     } catch (error) {
       console.error('Error sending email:', error)
-      setError('Failed to send email. Please try again.')
+      setError('Falha ao enviar email. Tente novamente.')
     } finally {
       setSending(false)
     }
@@ -150,7 +150,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">
-            {replyTo ? 'Reply' : 'Compose Email'}
+            {replyTo ? 'Responder' : 'Compor Email'}
           </Typography>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
@@ -167,7 +167,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
 
         {success && (
           <Alert severity="success" sx={{ mb: 2 }}>
-            Email sent successfully!
+            Email enviado com sucesso!
           </Alert>
         )}
 
@@ -187,7 +187,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="To"
+                label="Para"
                 fullWidth
                 InputProps={{
                   ...params.InputProps,
@@ -265,7 +265,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
         )}
 
         <TextField
-          label="Subject"
+          label="Assunto"
           fullWidth
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
@@ -273,7 +273,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
         />
 
         <TextField
-          label="Message"
+          label="Mensagem"
           fullWidth
           multiline
           rows={12}
@@ -285,7 +285,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
         {attachments.length > 0 && (
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
-              Attachments:
+              Anexos:
             </Typography>
             {attachments.map((attachment, index) => (
               <Box
@@ -332,11 +332,11 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
           onClick={() => fileInputRef.current?.click()}
           disabled={sending}
         >
-          Attach
+          Anexar
         </Button>
         <Box sx={{ flex: 1 }} />
         <Button onClick={onClose} disabled={sending}>
-          Cancel
+          Cancelar
         </Button>
         <Button
           variant="contained"
@@ -344,7 +344,7 @@ const EmailComposer: React.FC<EmailComposerProps> = ({ open, onClose, replyTo })
           onClick={handleSend}
           disabled={sending || !to.length || !subject.trim()}
         >
-          {sending ? 'Sending...' : 'Send'}
+          {sending ? 'Enviando...' : 'Enviar'}
         </Button>
       </DialogActions>
     </Dialog>

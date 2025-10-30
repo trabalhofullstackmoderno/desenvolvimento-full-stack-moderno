@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import {
   Search as SearchIcon,
-  Edit as EditIcon,
+  ChatBubble as ChatBubbleIcon,
   Circle as OnlineIcon,
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
@@ -504,7 +504,7 @@ const ChatInterface: React.FC = () => {
                 }
               }}
             >
-              <EditIcon />
+              <ChatBubbleIcon />
             </IconButton>
           </Box>
 
@@ -557,7 +557,7 @@ const ChatInterface: React.FC = () => {
                   </Typography>
                   <Button
                     variant="contained"
-                    startIcon={<EditIcon />}
+                    startIcon={<ChatBubbleIcon />}
                     onClick={() => setContactSearchOpen(true)}
                   >
                     New Chat
@@ -653,7 +653,7 @@ const ChatInterface: React.FC = () => {
                         }
                         secondary={
                           <Box component="span" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                            <Box sx={{ flex: 1, overflow: "hidden" }}>
+                            <Box component="span" sx={{ flex: 1, overflow: "hidden" }}>
                               {conversation.lastMessage ? (
                                 <Typography
                                   variant="body2"
@@ -681,7 +681,7 @@ const ChatInterface: React.FC = () => {
                                 >
                                   {conversation.contact.isOnline
                                     ? "Online"
-                                    : `Last seen ${formatLastSeen(conversation.contact.lastSeen)}`}
+                                    : `Visto por último ${formatLastSeen(conversation.contact.lastSeen)}`}
                                 </Typography>
                               )}
                             </Box>
@@ -756,10 +756,10 @@ const ChatInterface: React.FC = () => {
           >
            
         <Typography variant="h6" gutterBottom>
-          Select a conversation to start chatting
+          Selecione uma conversa para começar a conversar
         </Typography>
         <Typography variant="body2">
-          Choose a contact from your list or start a new conversation
+          Escolha um contato da sua lista ou inicie uma nova conversa
         </Typography>
       </Box>
         )}

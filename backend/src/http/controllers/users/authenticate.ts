@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { OAuth2Token } from "@fastify/oauth2";
 import { PrismaClient } from "@prisma/client";
 import { InvalidCredentialsError } from "@/services/errors/invalid-credentials-error";
+import { EmailValidationService } from "@/services/email-validation-service";
 import crypto from "crypto";
 
 const prisma = new PrismaClient();
@@ -41,6 +42,17 @@ export async function authenticate(
 
     const userInfo = (await userInfoRes.json()) as GoogleUserInfo;
 
+    // Validar se o email possui domínio permitido usando o serviço de validação
+    const validatedEmail = EmailValidationService.validateAndNormalize(userInfo.email);
+    if (!validatedEmail) {
+      const frontendUrl = process.env.NODE_ENV === "production"
+        ? process.env.FRONTEND_URL || "http://localhost:3000"
+        : "http://localhost:3000";
+
+      const errorMessage = `Acesso restrito a emails ${EmailValidationService.getAllowedDomain()}`;
+      return reply.redirect(`${frontendUrl}/login?error=domain_not_allowed&message=${encodeURIComponent(errorMessage)}`);
+    }
+
     // Encrypt tokens before storing
     const encryptedAccessToken = encryptToken(token.access_token);
     const encryptedRefreshToken = token.refresh_token
@@ -52,7 +64,7 @@ export async function authenticate(
         googleId: userInfo.id,
       },
       create: {
-        email: userInfo.email,
+        email: validatedEmail,
         googleId: userInfo.id,
         name: userInfo.name,
         picture: userInfo.picture,
@@ -60,7 +72,7 @@ export async function authenticate(
         refreshToken: encryptedRefreshToken,
       },
       update: {
-        email: userInfo.email,
+        email: validatedEmail,
         name: userInfo.name,
         picture: userInfo.picture,
         accessToken: encryptedAccessToken,
@@ -75,7 +87,7 @@ export async function authenticate(
     const accessToken = app.jwt.sign(
       {
         sub: userInfo.id,
-        email: userInfo.email,
+        email: validatedEmail,
         name: userInfo.name,
         picture: userInfo.picture,
       },

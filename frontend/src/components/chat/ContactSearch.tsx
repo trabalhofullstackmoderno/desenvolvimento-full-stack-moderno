@@ -59,11 +59,11 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
       }
     } catch (error: any) {
       if (error.response?.status === 404) {
-        setError('User not found. Make sure they have registered with this email.')
+        setError('Usuário não encontrado. Certifique-se de que ele se registrou com este email.')
       } else if (error.response?.status === 400) {
-        setError(error.response.data.message || 'Invalid email format')
+        setError(error.response.data.message || 'Formato de email inválido')
       } else {
-        setError('Error searching for user. Please try again.')
+        setError('Erro ao buscar usuário. Tente novamente.')
       }
       console.error('Error finding user:', error)
     } finally {
@@ -101,10 +101,10 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
     if (hours < 1) {
       return 'Online'
     } else if (hours < 24) {
-      return `${Math.floor(hours)}h ago`
+      return `${Math.floor(hours)}h atrás`
     } else {
       const days = Math.floor(hours / 24)
-      return `${days}d ago`
+      return `${days}d atrás`
     }
   }
 
@@ -117,7 +117,7 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
     >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">Start a new conversation</Typography>
+          <Typography variant="h6">Iniciar nova conversa</Typography>
           <IconButton onClick={handleClose} size="small">
             <CloseIcon />
           </IconButton>
@@ -126,17 +126,17 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
 
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Enter the email address of the person you want to chat with
+          Digite o endereço de email da pessoa com quem deseja conversar
         </Typography>
 
         <TextField
           fullWidth
-          label="Email address"
+          label="Endereço de email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="example@email.com"
+          placeholder="exemplo@email.com"
           disabled={loading}
           sx={{ mb: 2 }}
         />
@@ -194,14 +194,14 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
 
       <DialogActions>
         <Button onClick={handleClose}>
-          Cancel
+          Cancelar
         </Button>
         {foundUser ? (
           <Button
             variant="contained"
             onClick={handleStartChat}
           >
-            Start Chat
+            Iniciar Chat
           </Button>
         ) : (
           <Button
@@ -209,7 +209,7 @@ const ContactSearch: React.FC<ContactSearchProps> = ({ open, onClose, onSelectCo
             onClick={handleSearch}
             disabled={!email.trim() || loading}
           >
-            {loading ? <CircularProgress size={20} /> : 'Find User'}
+            {loading ? <CircularProgress size={20} /> : 'Buscar Usuário'}
           </Button>
         )}
       </DialogActions>
