@@ -5,6 +5,9 @@ import fastifyOauth2 from "@fastify/oauth2";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastify from "fastify";
+import {
+  jsonSchemaTransform
+} from "fastify-type-provider-zod";
 import { ZodError } from "zod";
 import { env } from "./env";
 import { chatRoutes } from "./http/controllers/chat/routes";
@@ -20,7 +23,9 @@ app.register(fastifySwagger, {
       description: 'Documentação da API de exemplo utilizando Fastify',
       version: '1.0.0',
     },
-  }
+  },
+  // Importante adicionar para fazer o parse do schema
+  transform: jsonSchemaTransform
 })
 
 app.register(fastifySwaggerUi, {
